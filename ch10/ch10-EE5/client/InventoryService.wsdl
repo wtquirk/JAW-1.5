@@ -1,0 +1,54 @@
+<definitions name='InventoryFacadeService' targetNamespace='http://ejb.jbossatwork.com/' xmlns='http://schemas.xmlsoap.org/wsdl/' xmlns:soap='http://schemas.xmlsoap.org/wsdl/soap/' xmlns:tns='http://ejb.jbossatwork.com/' xmlns:xsd='http://www.w3.org/2001/XMLSchema'>
+ <types>
+  <xs:schema targetNamespace='http://ejb.jbossatwork.com/' version='1.0' xmlns:tns='http://ejb.jbossatwork.com/' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+   <xs:element name='findAvailableCars' type='tns:findAvailableCars'/>
+   <xs:element name='findAvailableCarsResponse' type='tns:findAvailableCarsResponse'/>
+   <xs:complexType name='findAvailableCars'>
+    <xs:sequence/>
+   </xs:complexType>
+   <xs:complexType name='findAvailableCarsResponse'>
+    <xs:sequence>
+     <xs:element maxOccurs='unbounded' minOccurs='0' name='return' type='tns:carDTO'/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name='carDTO'>
+    <xs:sequence>
+     <xs:element name='id' type='xs:int'/>
+     <xs:element minOccurs='0' name='make' type='xs:string'/>
+     <xs:element minOccurs='0' name='model' type='xs:string'/>
+     <xs:element minOccurs='0' name='modelYear' type='xs:string'/>
+     <xs:element minOccurs='0' name='status' type='xs:string'/>
+    </xs:sequence>
+   </xs:complexType>
+  </xs:schema>
+ </types>
+ <message name='InventoryFacade_findAvailableCarsResponse'>
+  <part element='tns:findAvailableCarsResponse' name='findAvailableCarsResponse'></part>
+ </message>
+ <message name='InventoryFacade_findAvailableCars'>
+  <part element='tns:findAvailableCars' name='findAvailableCars'></part>
+ </message>
+ <portType name='InventoryFacade'>
+  <operation name='findAvailableCars' parameterOrder='findAvailableCars'>
+   <input message='tns:InventoryFacade_findAvailableCars'></input>
+   <output message='tns:InventoryFacade_findAvailableCarsResponse'></output>
+  </operation>
+ </portType>
+ <binding name='InventoryFacadeBinding' type='tns:InventoryFacade'>
+  <soap:binding style='document' transport='http://schemas.xmlsoap.org/soap/http'/>
+  <operation name='findAvailableCars'>
+   <soap:operation soapAction=''/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+ </binding>
+ <service name='InventoryFacadeService'>
+  <port binding='tns:InventoryFacadeBinding' name='InventoryFacadePort'>
+   <soap:address location='http://127.0.0.1:8180/jbossatwork-ws/InventoryService'/>
+  </port>
+ </service>
+</definitions>

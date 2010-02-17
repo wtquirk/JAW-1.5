@@ -1,0 +1,6 @@
+table
+{
+    border-style: solid;    border-color: #aaa;    border-width: 1px;
+}
+
+th{    color: #000;    background-color: #ccc;    border-style: solid;    border-color: #aaa;    border-width: 1px;    font-weight: bold;    text-align: left;}td{    color: #000;    background-color: #fff;    border-style: solid;    border-color: #aaa;    border-width: 1px;    text-align: left;    }.model-year{    text-align: right;    }

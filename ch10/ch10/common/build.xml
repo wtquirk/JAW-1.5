@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+
+<project name="ch10-jar" default="all" basedir=".">
+
+    <!-- Initialization variables -->
+    <property environment="env" />
+
+    <property name="app.name" value="${ant.project.name}"/>
+    <property name="source.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="distribution.dir" value="${build.dir}/distribution"/>
+
+    <!-- files in compile.lib.dir will NOT be included in the final JAR -->
+    <property name="compile.lib.dir" value="${env.JBOSS_HOME}/common/lib"/>
+
+    <property name="jar.name" value="common.jar"/>
+    
+    <property name="xdoclet.lib.dir" value="${env.XDOCLET_HOME}/lib"/>
+    <property name="gen.source.dir" value="${build.dir}/gensrc"/>
+    <property name="hibernate.dir" value="hibernate"/>
+    <property name="hibernate.lib.dir" value="${env.JBOSS_HOME}/common/lib"/>    
+        
+    <!--
+     =======================================================
+        This builds the classpath used for compilation.
+        NOTE: This is independent of your system classpath
+     =======================================================
+    -->
+    <path id="compile.classpath">
+        <fileset dir="${compile.lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${hibernate.lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+    
+    <!--
+     =======================================================
+        XDoclet setup
+     =======================================================
+    -->
+    <path id="xdoclet.lib.path">
+        <fileset dir="${xdoclet.lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        
+        <fileset dir="${compile.lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>        
+    </path>
+    
+    
+    
+
+    <!-- ============================= -->
+    <target name="all" depends="clean,jar,har" description="Does the whole enchilada"/>
+
+    <!-- ====================================== -->
+    <target name="clean" description="Deletes compiled and generated code">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="compile" description="Compiles the Java code">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${classes.dir}" />
+
+        <javac srcdir="${source.dir}" destdir="${classes.dir}" debug="on" deprecation="on">
+             <classpath refid="compile.classpath"/>
+         </javac>
+
+        <copy todir="${classes.dir}">
+            <fileset dir="${source.dir}">
+                <include name="**/*.properties" />
+                <include name="**/*.xml" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="jar" depends="compile" description="Packages the common files into a JAR file">
+        <mkdir dir="${distribution.dir}" />
+
+        <jar destFile="${distribution.dir}/${jar.name}">
+            <!-- files to be included in / -->
+            <fileset dir="${classes.dir}" />
+        </jar>
+    </target>
+
+
+    <!-- ====================================== -->
+    <target name="generate-hbm" description="Generate Hibernate hbm.xml file">
+        <taskdef name="hibernatedoclet" 
+                 classname="xdoclet.modules.hibernate.HibernateDocletTask"
+                 classpathref="xdoclet.lib.path" />
+
+        <mkdir dir="${build.dir}" />    
+        <mkdir dir="${gen.source.dir}" />         
+                 
+        <hibernatedoclet destdir="${gen.source.dir}">
+            <fileset dir="${source.dir}">
+                <include name="**/*DTO.java" />
+            </fileset>
+            
+            <hibernate version="3.0" />
+        </hibernatedoclet>
+    </target>
+
+
+    <!-- ====================================== -->
+    <target name="har" depends="generate-hbm" description="Builds the Hibernate HAR file">
+        <mkdir dir="${distribution.dir}" />
+        
+        <jar destfile="${distribution.dir}/jaw.har">                    
+            <!-- include the hbm.xml files  -->
+            <fileset dir="${gen.source.dir}">
+                <include name="**/*.hbm.xml"/>
+            </fileset>
+            
+            <!-- include jaw-hibernate.xml -->
+            <metainf dir="${hibernate.dir}">
+                <include name="jaw-hibernate.xml"/>
+            </metainf>
+
+        </jar>
+    </target>
+
+
+    <!-- ====================================== -->
+    <target name="generate-hbmxxx" description="Generate Hibernate hbm.xml file">
+        <taskdef name="hibernatedoclet" 
+                 classname="xdoclet.modules.hibernate.HibernateDocletTask"
+                 classpathref="xdoclet.lib.path" />
+
+        <mkdir dir="${build.dir}" />    
+        <mkdir dir="${gen.source.dir}" />         
+                 
+        <hibernatedoclet destdir="${gen.source.dir}">
+            <fileset dir="${source.dir}">
+                <include name="**/*DTO.java" />
+            </fileset>
+            
+            <hibernate version="3.0" />
+
+            <jbossservice destdir="${gen.source.dir}" 
+                          serviceName="JAW-Hibernate"
+                          jndiName="java:/JAW-HibernateSessionFactory"  
+                          depends="jboss.jca:service=LocalTxCM,name=JBossAtWorkDS"   
+                          dataSource="java:/JBossAtWorkDS"  
+                          dialect="org.hibernate.dialect.HSQLDialect"  
+                          cacheProvider="org.hibernate.cache.HashtableCacheProvider"
+                          transactionManagerStrategy="org.hibernate.transaction.JBossTransactionManagerLookup"                
+                          transactionStrategy="org.hibernate.transaction.JTATransactionFactory" 
+                          version="3.0" />
+
+<!--
+            <jbossservice destdir="${gen.source.dir}" 
+                          serviceName="JAW-Hibernate"
+                          jndiName="java:/JAW-HibernateSessionFactory"  
+                          depends="jboss.jca:service=LocalTxCM,name=JBossAtWorkDS"   
+                          dataSource="java:/JBossAtWorkDS"  
+                          dialect="net.sf.hibernate.dialect.HSQLDialect"  
+                          cacheProvider="net.sf.hibernate.cache.HashtableCacheProvider"
+                          transactionManagerStrategy="net.sf.hibernate.transaction.JBossTransactionManagerLookup"                
+                          transactionStrategy="net.sf.hibernate.transaction.JTATransactionFactory" 
+                          version="2.1"
+                          templateFile="${xdoclet.template.dir}/jboss-service.xdt" />
+-->
+
+        </hibernatedoclet>        
+    </target>
+
+
+
+
+
+</project>

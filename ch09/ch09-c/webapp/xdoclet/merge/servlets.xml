@@ -1,0 +1,8 @@
+   <servlet>
+       <servlet-name>NonsecureController</servlet-name>
+       <servlet-class>com.jbossatwork.ControllerServlet</servlet-class>
+
+      <run-as>
+         <role-name>guest</role-name>
+      </run-as>
+   </servlet>

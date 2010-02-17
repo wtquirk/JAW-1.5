@@ -1,0 +1,43 @@
+=============================================
+Change History for the JBoss At Work example
+=============================================
+
+-------------------------------------------
+Version 2.0.0, 2009-02-01 Bill Quirk
+-------------------------------------------
+
+
+Updated for JBoss AS 5. See document 'JAW Update for JBoss AS5.0'
+ 
+
+--------------------------
+Version 1.0.3, 2007-02-08
+--------------------------
+Solved the missing/empty directory problem caused by the MS Windows unzip program.
+
+--------------------------
+Version 1.0.2, 2006-01-19
+--------------------------
+Added "colddeploy" target to top-level build script for chapters 3-5.
+ch03c-webdoclet now builds web.xml with Servlet Spec 2.4
+ch09 - Fixed security holes. Generating HBM files for Hibernate 3.0 (was using 2.1).
+ch06-10 and appb - "colddeploy" target now depends on "deploy" target, which depends on "all" target.
+ch06-10 and appb - application.xml now uses <ejb> element for EJB JAR (was using <java>).
+ch06-10 and appb - Turned off Hibernate SQL logging in hibernate-service.xml.
+Upgraded README.TXT
+
+--------------------------
+Version 1.0.1, 2005-11-02
+--------------------------
+Removed hard-coded references to /Library/xdoclet, 
+  /Library/jboss, etc.
+
+Replaced with ${env.XDOCLET_HOME}, ${env.JBOSS_HOME}
+
+------------------------
+Version 1.0, 2005-10-01
+------------------------
+Initial release.
+
+
+

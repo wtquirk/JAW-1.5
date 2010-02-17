@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+
+<project name="sql" default="init" basedir=".">
+
+    <!-- Initialization variables -->
+    <property environment="env" />
+
+    <property name="database.driver.dir" value="${env.JBOSS_HOME}/common/lib/"/>  
+    <property name="database.driver.jar" value="hsqldb.jar"/>    
+
+    <path id="sql.classpath">
+        <fileset dir="${database.driver.dir}">
+            <include name="${database.driver.jar}"/>
+        </fileset>
+    </path>
+
+    <!-- ====================================== -->
+    <target name="init"
+            description="Creates test data in the database.">
+
+        <sql driver="org.hsqldb.jdbcDriver"         
+             url="jdbc:hsqldb:hsql://localhost:1701"
+             userid="sa" 
+             password=""
+             print="yes"
+             classpathref="sql.classpath">
+
+             DROP TABLE IF EXISTS CAR;
+    
+             CREATE TABLE CAR (
+                ID BIGINT identity,
+                MAKE VARCHAR(50),
+                MODEL VARCHAR(50),
+                MODEL_YEAR VARCHAR(50),
+                STATUS VARCHAR(10)
+             );
+            
+    
+             INSERT INTO CAR (ID, MAKE, MODEL, MODEL_YEAR, STATUS)
+             VALUES (99, 'Toyota', 'Camry', '2005', 'Available');
+    
+             INSERT INTO CAR (ID, MAKE, MODEL, MODEL_YEAR, STATUS)
+             VALUES (100, 'Toyota', 'Corolla', '1999', 'Available');
+
+             INSERT INTO CAR (ID, MAKE, MODEL, MODEL_YEAR, STATUS)
+             VALUES (101, 'Ford', 'Explorer', '2005', 'Available');
+             
+             SELECT * FROM CAR;
+
+
+             DROP TABLE IF EXISTS ACCOUNTING;
+             
+             CREATE TABLE ACCOUNTING (
+	         ID BIGINT identity,
+	         CAR_ID BIGINT,
+	         PRICE DOUBLE,
+	         SALE_DATE DATE
+	     );
+	     
+         </sql>
+     </target>
+
+    <!-- ====================================== -->
+    <target name="query"
+            description="Checks test data in the database.">
+
+        <echo>Checking the CAR and ACCOUNTING tables ...</echo>
+        
+        <sql driver="org.hsqldb.jdbcDriver"         
+             url="jdbc:hsqldb:hsql://localhost:1701"
+             userid="sa" 
+             password=""
+             print="yes"
+             classpathref="sql.classpath">
+            
+             SELECT * FROM CAR;
+             
+             SELECT * FROM ACCOUNTING;
+         </sql>
+     </target>
+
+</project>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns="http://java.sun.com/xml/ns/jax-rpc/ri/config">
+  <service name="InventoryService"
+           targetNamespace="http://localhost:8080/jbossatwork-ws"
+           typeNamespace="http://localhost:8080/jbossatwork-ws/types"
+           packageName="com.jbossatwork.ws">
+    <interface name="com.jbossatwork.ws.InventoryEndpoint"/>
+  </service>
+</configuration>

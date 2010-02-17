@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+
+<project name="jaw" default="all" basedir=".">
+    <property environment="env"/>
+    
+    <!-- JBoss sub-directories -->
+    
+    <property name="jboss.home" location="${env.JBOSS_HOME}"/>
+    
+    <property name="server.dir" location="${jboss.home}/server/${env.JBOSS_CONFIG_NAME}"/>
+    <property name="server.conf.dir" location="${server.dir}/conf"/>
+    <property name="server.deploy.dir" location="${server.dir}/deploy"/>
+    <property name="server.log.dir" location="${server.dir}/log"/>
+    <property name="server.tmp.dir" location="${server.dir}/tmp"/>
+    <property name="server.work.dir" location="${server.dir}/work"/>
+    
+    <!-- Initialization variables -->
+    <property name="app.name" value="${ant.project.name}"/>
+    <property name="source.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="distribution.dir" value="${build.dir}/distribution"/>
+
+    <property name="meta-inf.dir" value="${source.dir}/META-INF"/>
+
+    <!-- subdirectories for EAR components -->
+    <property name="webapp.dir" value="webapp"/>
+    <property name="webapp.war.dir" value="${webapp.dir}/build/distribution"/>
+    <property name="webapp.war.name" value="webapp.war"/>
+    
+    <property name="common.dir" value="common"/>
+    <property name="common.jar.dir" value="${common.dir}/build/distribution"/>
+    <property name="common.jar.name" value="common.jar"/>
+
+    <property name="ear.name" value="${ant.project.name}.ear"/>   
+
+    <!-- ============================= -->
+    <target name="all" depends="clean,ear" description="Does the whole enchilada"/>
+
+    <!-- ====================================== -->
+    <target name="clean" description="Deletes compiled and generated code">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="cleanall" depends="clean" description="Deletes compiled and generated code for the entire project">
+        <echo message="##### Cleaning common #####" />
+        <ant dir="${common.dir}" target="clean" />
+        
+        <echo message="##### Cleaning webapp #####" />
+        <ant dir="${webapp.dir}" target="clean" />         
+    </target>
+
+
+    <!-- ====================================== -->
+    <target name="compile" description="Compiles the Java code">
+        <echo message="##### Building common #####" />
+        <ant dir="${common.dir}" target="all" >
+            <property name="jar.name" value="${common.jar.name}"/>
+        </ant>
+
+        <echo message="##### Building webapp #####" />
+        <ant dir="${webapp.dir}" target="all" >
+            <property name="war.name" value="${webapp.war.name}"/>
+            <property name="common.jar.dir" value="${basedir}/${common.jar.dir}"/>
+        </ant>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="ear" depends="compile" description="Packages all files into an EAR file">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${distribution.dir}" />
+
+        <echo message="##### Building EAR #####" />    
+        <ear destFile="${distribution.dir}/${ear.name}" appxml="${meta-inf.dir}/application.xml" >
+            <!-- files to be included in / -->
+            <fileset dir="${webapp.war.dir}" />
+            <fileset dir="${common.jar.dir}" />
+        </ear>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="colddeploy" depends="deploy-uninstall, deploy"
+            description="Cleans up and deploys the EAR file on JBoss">
+    </target>
+
+    <target name="deploy" depends="all" description="Deploys the EAR">
+        <copy file="${distribution.dir}/${ear.name}" todir="${server.deploy.dir}"/>
+        
+        <echo message="${app.name} sucessfully deployed to ${server.deploy.dir}"/>
+    </target>    
+
+    <target name="deploy-uninstall" description="Cleans up JBoss deployment area">
+        <delete dir="${server.log.dir}"/>
+        <delete dir="${server.tmp.dir}"/>
+        <delete dir="${server.work.dir}"/>
+        
+        <delete>
+            <fileset dir="${server.deploy.dir}">
+              <include name="jaw.*ar"/>
+            </fileset>
+        </delete>
+    </target>
+    
+</project>

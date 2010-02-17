@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<project name="common" default="all" basedir=".">
+
+    <!-- Initialization variables -->
+    <property name="app.name" value="${ant.project.name}"/>
+    <property name="source.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="distribution.dir" value="${build.dir}/distribution"/>
+
+    <property name="jar.name" value="common.jar"/>
+
+    <!-- ============================= -->
+    <target name="all" depends="clean,jar" description="Does the whole enchilada"/>
+
+    <!-- ====================================== -->
+    <target name="clean" description="Deletes compiled and generated code">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="compile" description="Compiles the Java code">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${classes.dir}" />
+
+        <javac srcdir="${source.dir}" destdir="${classes.dir}" debug="on" deprecation="on">
+         </javac>
+
+        <copy todir="${classes.dir}">
+            <fileset dir="${source.dir}">
+                <include name="**/*.properties" />
+                <include name="**/*.xml" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="jar" depends="compile" description="Packages the common files into a JAR file">
+        <mkdir dir="${distribution.dir}" />
+
+        <jar destFile="${distribution.dir}/${jar.name}">
+            <!-- files to be included in / -->
+            <fileset dir="${classes.dir}" />
+        </jar>
+    </target>
+
+</project>

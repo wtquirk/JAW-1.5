@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+
+<project name="ch06-EE5-ejb" default="all" basedir=".">
+
+    <!-- Initialization variables -->
+    <property environment="env" />
+
+    <property name="app.name" value="${ant.project.name}"/>
+    <property name="source.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="distribution.dir" value="${build.dir}/distribution"/>
+
+    <property name="common.jar.dir" value="../common/build/distribution"/>
+
+    <property name="serverlib" location="${jboss.home}/common/lib" />
+
+    <path id="compile.classpath">
+      <fileset dir="${serverlib}" includes="*.jar"/>
+      <fileset dir="${common.jar.dir}" includes="*.jar"/>
+    </path>
+
+    <property name="ejb.jar.name" value="ejb.jar"/>
+
+    <!-- ============================= -->
+    <target name="all" depends="clean,build-ejb-jar" description="Does the whole enchilada"/>
+
+    <!-- ====================================== -->
+    <target name="clean" description="Deletes compiled and generated code">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="compile" description="Compiles the Java code">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${classes.dir}" />
+
+         <javac srcdir="${source.dir}" destdir="${classes.dir}" debug="on" deprecation="on">    
+          <classpath refid="compile.classpath"/>
+         </javac>
+
+        <copy todir="${classes.dir}">
+            <fileset dir="${source.dir}">
+                <include name="**/*.properties" />
+                <include name="**/*.xml" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ====================================== -->
+
+    <property name="descriptor.dir" value="descriptors"/>
+    <property name="meta.dir" value="classes/META-INF"/>
+
+    <target name="build-ejb-jar" depends="compile" description="Packages the EJB files into a EJB JAR file">
+
+        <mkdir dir="${distribution.dir}" />
+        
+        <jar destfile="${distribution.dir}/${ejb.jar.name}" basedir="${classes.dir}">
+
+        </jar>
+    </target>
+
+</project>

@@ -1,0 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%    // DON'T FREAK OUT!!! This scriptlet code will go away once    // we have a model and controller in place...        String[][] carList = {            {"Toyota", "Camry", "2005"},            {"Toyota", "Corolla", "1999"},            {"Ford", "Explorer", "2005"}    };        pageContext.setAttribute("carList", carList);%><html>
+<head>  <link rel="stylesheet" type="text/css" href="default.css"></head>
+<body>
+  <table>    <tr>      <th>Make</th>      <th>Model</th>      <th class="model-year">Model Year</th>    </tr>        <c:forEach items='${carList}' var='car'>      <tr>      <td>${car[0]}</td>      <td>${car[1]}</td>      <td class="model-year">${car[2]}</td>      </tr>    </c:forEach>  </table></body></html>

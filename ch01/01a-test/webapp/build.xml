@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+
+<project name="jaw" default="all" basedir=".">
+
+    <!-- Initialization variables -->
+    <property name="app.name" value="${ant.project.name}"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="distribution.dir" value="${build.dir}/distribution"/>
+
+    <property name="war.name" value="${app.name}.war"/>
+    <property name="web.dir" value="web"/>
+    <property name="web.inf.dir" value="${web.dir}/WEB-INF"/>
+    
+    <property environment="env" />
+
+
+    <!-- ============================= -->
+    <target name="all" depends="clean,war" description="Does the whole enchilada"/>
+
+    <!-- ====================================== -->
+    <target name="clean" description="Deletes compiled and generated code">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="compile" description="Compiles the Java code">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${classes.dir}" />
+    </target>
+
+    <!-- ====================================== -->
+    <target name="war" depends="compile" description="Packages the Web files into a WAR file">
+        <mkdir dir="${distribution.dir}" />
+
+        <war destFile="${distribution.dir}/${war.name}" webxml="${web.inf.dir}/web.xml">
+            <!-- files to be included in / -->
+            <fileset dir="${web.dir}" excludes="WEB-INF/web.xml" />
+
+            <!-- files to be included in /WEB-INF/classes -->
+            <classes dir="${classes.dir}" />
+
+            <!-- files to be included in /WEB-INF -->
+            <webinf dir="${web.inf.dir}" excludes="web.xml" />
+        </war>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="deploy" description="Deploys the WAR">
+        <copy file="${distribution.dir}/${war.name}" todir="${env.JBOSS_HOME}/server/${env.JBOSS_CONFIG_NAME}/deploy"/>
+    </target>
+
+
+
+</project>

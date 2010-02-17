@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- The Hypersonic embedded database JCA connection factory config
+$Id: hsqldb-ds.xml,v 1.15 2004/09/15 14:37:40 loubyansky Exp $ -->
+
+
+<datasources>
+
+   <local-tx-datasource>
+      <jndi-name>JBossAtWorkDS</jndi-name>
+      <connection-url>jdbc:hsqldb:hsql://localhost:1701</connection-url>
+      <driver-class>org.hsqldb.jdbcDriver</driver-class>
+      <user-name>sa</user-name>
+      <password></password>
+      <min-pool-size>5</min-pool-size>
+      <max-pool-size>20</max-pool-size>
+      <idle-timeout-minutes>0</idle-timeout-minutes>
+      <track-statements/>
+      <metadata>
+         <type-mapping>Hypersonic SQL</type-mapping>
+      </metadata>
+      <depends>jboss:service=Hypersonic-JAW,database=jawdb</depends>
+   </local-tx-datasource>
+
+   <mbean code="org.jboss.jdbc.HypersonicDatabase" 
+     name="jboss:service=Hypersonic-JAW,database=jawdb">
+     <attribute name="Port">1701</attribute>
+     <attribute name="Silent">true</attribute>
+     <attribute name="Database">jawdb</attribute>
+     <attribute name="Trace">false</attribute>
+     <attribute name="No_system_exit">true</attribute>
+   </mbean>
+
+</datasources>

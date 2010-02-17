@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+
+<project name="ch10-EE5-ejb" default="all" basedir=".">
+
+    <!-- Initialization variables -->
+    <property environment="env" />
+
+    <property name="app.name" value="${ant.project.name}"/>
+    <property name="source.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="distribution.dir" value="${build.dir}/distribution"/>
+
+    <!-- files in compile.lib.dir will NOT be included in the final EJB JAR -->
+    <property name="compile.lib.dir" value="${env.JBOSS_HOME}/common/lib"/>
+
+    <property name="common.jar.dir" value="../common/build/distribution"/>
+
+    <property name="ejb.jar.name" value="ejb.jar"/>
+
+    <property name="meta.inf.dir" value="META-INF"/>
+        
+    <!--
+     =======================================================
+        This builds the classpath used for compilation.
+        NOTE: This is independent of your system classpath
+     =======================================================
+    -->
+    <path id="compile.classpath">
+        <fileset dir="${compile.lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${common.jar.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+
+    <!-- ============================= -->
+    <target name="all" depends="clean,build-ejb-jar" description="Does the whole enchilada"/>
+
+    <!-- ====================================== -->
+    <target name="clean" description="Deletes compiled and generated code">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="compile" description="Compiles the Java code">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${classes.dir}" />
+
+        <javac srcdir="${source.dir}" destdir="${classes.dir}" debug="on" deprecation="on">
+             <classpath refid="compile.classpath"/>
+         </javac>
+
+        <copy todir="${classes.dir}">
+            <fileset dir="${source.dir}">
+                <include name="**/*.properties" />
+                <include name="**/*.xml" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="build-ejb-jar" depends="compile" description="Packages the EJB files into a EJB JAR file">
+        <mkdir dir="${distribution.dir}" />
+        
+        <jar destfile="${distribution.dir}/${ejb.jar.name}" basedir="${classes.dir}">
+                <metainf dir="${meta.inf.dir}" includes="*.xml"/>
+        </jar>
+    </target>
+
+</project>

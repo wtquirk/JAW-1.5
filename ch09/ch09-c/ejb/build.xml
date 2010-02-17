@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+
+<project name="ch09-ejb" default="all" basedir=".">
+
+    <!-- Initialization variables -->
+    <property environment="env" />
+
+    <property name="app.name" value="${ant.project.name}"/>
+    <property name="source.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="distribution.dir" value="${build.dir}/distribution"/>
+
+    <!-- files in compile.lib.dir will NOT be included in the final EJB JAR -->
+    <property name="compile.lib.dir" value="${env.JBOSS_HOME}/common/lib"/>
+
+    <property name="common.jar.dir" value="../common/build/distribution"/>
+
+    <property name="ejb.jar.name" value="ejb.jar"/>
+    
+    <property name="xdoclet.lib.dir" value="${env.XDOCLET_HOME}/lib"/>
+    <property name="gen.source.dir" value="${build.dir}/gensrc"/>
+        
+    <!--
+     =======================================================
+        This builds the classpath used for compilation.
+        NOTE: This is independent of your system classpath
+     =======================================================
+    -->
+    <path id="compile.classpath">
+        <fileset dir="${compile.lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${common.jar.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <!--
+     =======================================================
+        XDoclet setup
+     =======================================================
+    -->
+    <path id="xdoclet.lib.path">
+        <fileset dir="${xdoclet.lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        
+        <fileset dir="${compile.lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset> 
+        
+        <fileset dir="${common.jar.dir}">
+	     <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+
+
+
+    <!-- ============================= -->
+    <target name="all" depends="clean,build-ejb-jar" description="Does the whole enchilada"/>
+
+    <!-- ====================================== -->
+    <target name="clean" description="Deletes compiled and generated code">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="compile" description="Compiles the Java code">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${classes.dir}" />
+
+        <javac srcdir="${source.dir}:${gen.source.dir}" destdir="${classes.dir}" debug="on" deprecation="on">
+             <classpath refid="compile.classpath"/>
+         </javac>
+
+        <copy todir="${classes.dir}">
+            <fileset dir="${source.dir}">
+                <include name="**/*.properties" />
+                <include name="**/*.xml" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ====================================== -->
+    <target name="build-ejb-jar" depends="run-ejbdoclet, compile" description="Packages the EJB files into a EJB JAR file">
+        <mkdir dir="${distribution.dir}" />
+        
+        <jar destfile="${distribution.dir}/${ejb.jar.name}" basedir="${classes.dir}">
+                <metainf dir="${gen.source.dir}" includes="*.xml"/>
+        </jar>
+    </target>
+
+
+    <!-- ====================================== -->
+
+    <target name="run-ejbdoclet" description="Generate EJB artifacts">
+        <taskdef name="ejbdoclet"
+                 classname="xdoclet.modules.ejb.EjbDocletTask"
+                 classpathref="xdoclet.lib.path"/>
+                 
+        <mkdir dir="${gen.source.dir}" />    
+        <ejbdoclet destdir="${gen.source.dir}" ejbspec="2.1">
+           
+            <fileset dir="${source.dir}">
+                <include name="**/*Bean.java"/>
+            </fileset>
+
+            <remoteinterface pattern="{0}Remote"/>
+            <localinterface pattern="{0}Local"/>
+
+            <homeinterface pattern="{0}RemoteHome"/>
+            <localhomeinterface pattern="{0}LocalHome"/>
+
+            <deploymentdescriptor destdir="${gen.source.dir}"/>
+            
+            <jboss version="4.0" destdir="${gen.source.dir}"
+                   securitydomain="java:/jaas/JawJaasDbRealm"/>
+        
+        </ejbdoclet>
+    </target>
+
+</project>

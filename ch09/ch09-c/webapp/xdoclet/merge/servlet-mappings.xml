@@ -1,0 +1,4 @@
+   <servlet-mapping>
+      <servlet-name>NonsecureController</servlet-name>
+      <url-pattern>/controller/*</url-pattern>
+   </servlet-mapping>

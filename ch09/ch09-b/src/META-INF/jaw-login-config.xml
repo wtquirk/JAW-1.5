@@ -1,0 +1,21 @@
+<?xml version='1.0'?>
+<!DOCTYPE policy PUBLIC
+      "-//JBoss//DTD JBOSS Security Config 3.0//EN"
+      "http://www.jboss.org/j2ee/dtd/security_config.dtd">
+
+<policy>
+
+    <application-policy name = "JawJaasDbRealm">
+       <authentication>
+          <login-module code = "org.jboss.security.auth.spi.DatabaseServerLoginModule"
+             flag = "required">
+             <module-option name="unauthenticatedIdentity">guest</module-option>
+             <module-option name="password-stacking">useFirstPass</module-option>
+             <module-option name="dsJndiName">java:/JBossAtWorkDS</module-option>
+             <module-option name="principalsQuery">SELECT PASSWORD FROM USER WHERE NAME=?</module-option>
+             <module-option name="rolesQuery">SELECT ROLE.NAME, 'Roles' FROM ROLE, USER_ROLE, USER WHERE USER.NAME=? AND USER.ID=USER_ROLE.USER_ID AND ROLE.ID = USER_ROLE.ROLE_ID</module-option>
+          </login-module>
+       </authentication>
+    </application-policy>  
+    
+</policy>
